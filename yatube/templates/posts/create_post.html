@@ -13,7 +13,7 @@
                 {% endif %}
               </div>
               {% if is_edit %}
-              <form action="{% url 'posts:post_edit' %}" method="post">
+              <form action="{% url 'posts:post_create' %}" method="post">
               {% csrf_token %}
                 <div class="form-group row my-3 p-3">
                   <label for="id_text">Текст поста<span class="required text-danger" >*</span></label>

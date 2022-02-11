@@ -22,7 +22,6 @@ def index(request):
     return render(request, 'posts/index.html', context)
 
 
-@login_required
 def group_posts(request, slug):
     title = "Все записи группы"
     group = get_object_or_404(Group, slug=slug)
@@ -40,7 +39,6 @@ def group_posts(request, slug):
     return render(request, 'posts/group_list.html', context)
 
 
-@login_required
 def profile(request, username):
     title = "Профайл пользователя " + username
     user = get_object_or_404(User, username=username)
@@ -59,7 +57,6 @@ def profile(request, username):
     return render(request, 'posts/profile.html', context)
 
 
-@login_required
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     post_list = Post.objects.all()
@@ -81,11 +78,11 @@ def post_create(request):
             post.author = request.user
             post.save()
             return redirect('posts:profile', request.user)
-    else:
-        form = PostForm()
-        context = {
-            'form': form,
+    form = PostForm()
+    context = {
+        'form': form,
         }
+       
     return render(request, 'posts/create_post.html', context)
 
 
