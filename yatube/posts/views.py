@@ -7,13 +7,17 @@ from .forms import PostForm
 from .models import Group, Post, User
 
 
+def get_paginator_page(request, query_set):
+    paginator = Paginator(query_set, settings.COUNT_POSTS)
+    page_number = request.GET.get('page')
+    return paginator.get_page(page_number)
+
+
 def index(request):
     title = "Главная страница проекта Yatube"
     posts = Post.objects.select_related('group')[:settings.COUNT_POSTS]
     post_list = Post.objects.all()
-    paginator = Paginator(post_list, settings.COUNT_POSTS)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = get_paginator_page(request, post_list)
     context = {
         'posts': posts,
         'title': title,
@@ -26,9 +30,7 @@ def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.all()[:settings.COUNT_POSTS]
     post_list = Post.objects.all()
-    paginator = Paginator(post_list, settings.COUNT_POSTS)
-    page_number = request.GET.get('page')
-    page_obj = paginator.get_page(page_number)
+    page_obj = get_paginator_page(request, post_list)
     context = {
         'group': group,
         'posts': posts,
