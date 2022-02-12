@@ -5,12 +5,7 @@ from django.shortcuts import get_object_or_404, redirect, render
 
 from .forms import PostForm
 from .models import Group, Post, User
-
-
-def get_paginator_page(request, query_set):
-    paginator = Paginator(query_set, settings.COUNT_POSTS)
-    page_number = request.GET.get('page')
-    return paginator.get_page(page_number)
+from .pagination import get_paginator_page
 
 
 def index(request):
