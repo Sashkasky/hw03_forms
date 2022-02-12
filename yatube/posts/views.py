@@ -67,19 +67,13 @@ def post_detail(request, post_id):
 
 @login_required
 def post_create(request):
-    if request.method == 'POST':
-        form = PostForm(request.POST)
-        if form.is_valid():
-            post = form.save(commit=False)
-            post.author = request.user
-            post.save()
-            return redirect('posts:profile', request.user)
-    form = PostForm()
-    context = {
-        'form': form,
-    }
-
-    return render(request, 'posts/create_post.html', context)
+    form = PostForm(request.POST or None)
+    if form.is_valid():
+        post = form.save(commit=False)
+        post.author = request.user
+        post.save()
+        return redirect('posts:profile', request.user)
+    return render(request, 'posts/create_post.html', {'form': form})
 
 
 @login_required
