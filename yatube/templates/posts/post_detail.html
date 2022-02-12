@@ -1,9 +1,6 @@
 {% extends 'base.html' %}
 {% block content %}
-  <head>  
-    <!-- Подключены иконки, стили и заполенены мета теги -->
-    <title>Пост <!-- Первые 30 букв поста --></title>
-  </head>
+{% block title %}<title>Пост {{ post.text|truncatechars:30 }}</title>{% endblock %}
   <body>       
     <main>
       <div class="row">

@@ -1,10 +1,10 @@
-from django.core.paginator import Paginator
-from django.shortcuts import render, get_object_or_404
-from django.shortcuts import redirect
-from .models import Post, Group, User
-from .forms import PostForm
 from django.conf import settings
 from django.contrib.auth.decorators import login_required
+from django.core.paginator import Paginator
+from django.shortcuts import get_object_or_404, redirect, render
+
+from .forms import PostForm
+from .models import Group, Post, User
 
 
 def index(request):
@@ -23,7 +23,6 @@ def index(request):
 
 
 def group_posts(request, slug):
-    title = "Все записи группы"
     group = get_object_or_404(Group, slug=slug)
     posts = group.posts.all()[:settings.COUNT_POSTS]
     post_list = Post.objects.all()
@@ -33,7 +32,6 @@ def group_posts(request, slug):
     context = {
         'group': group,
         'posts': posts,
-        'title': title,
         'page_obj': page_obj,
     }
     return render(request, 'posts/group_list.html', context)
@@ -60,11 +58,9 @@ def profile(request, username):
 def post_detail(request, post_id):
     post = get_object_or_404(Post, id=post_id)
     post_list = Post.objects.all()
-    title = f'Пост {post.text[:30]}'
     context = {
         'post': post,
         'post_list': post_list,
-        'title': title,
     }
     return render(request, 'posts/post_detail.html', context)
 

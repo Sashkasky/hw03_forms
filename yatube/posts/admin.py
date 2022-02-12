@@ -12,7 +12,13 @@ class PostAdmin(admin.ModelAdmin):
     list_editable = ('group',)
 
 
+class GroupAdmin(admin.ModelAdmin):
+    list_display = ('title', 'slug', 'description')
+    list_filter = ('title',)
+    list_editable = ('slug',)
+
+
 # При регистрации модели Post источником конфигурации для неё назначаем
 # класс PostAdmin
 admin.site.register(Post, PostAdmin)
-admin.site.register(Group)
+admin.site.register(Group, GroupAdmin)
