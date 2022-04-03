@@ -12,16 +12,23 @@ class Post(models.Model):
         blank=True,
         null=True,
         on_delete=models.SET_NULL,
-        related_name='posts'
+        related_name='posts',
+        verbose_name='Группа',
+        help_text='Группа, к которой будет относиться пост'
     )
-    text = models.TextField()
+    text = models.TextField(
+        'Текст поста',
+        help_text='Введите текст поста'
+    )
     pub_date = models.DateTimeField(
+        'Дата публикации',
         auto_now_add=True
     )
     author = models.ForeignKey(
         User,
         on_delete=models.CASCADE,
-        related_name='posts'
+        related_name='posts',
+        verbose_name='Автор'
     )
 
     def __str__(self):
