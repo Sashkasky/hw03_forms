@@ -49,7 +49,7 @@ class PostsURLTests(TestCase):
         }
         for address, template in templates_url_names.items():
             with self.subTest(address=address):
-                response = self.author_client.get(address)
+                response = self.authorized_client.get(address)
                 self.assertTemplateUsed(response, template)
 
     def test_pages_for_all(self):
@@ -73,7 +73,7 @@ class PostsURLTests(TestCase):
 
     def test_post_edit_only_for_author(self):
         """Страница post_create доступна автору."""
-        response = self.author_client.get('/create/')
+        response = self.author_client.get(f'/posts/{self.post.id}/edit/')
         self.assertEqual(response.status_code, HTTPStatus.OK)
 
     def test_unexisting_page(self):
