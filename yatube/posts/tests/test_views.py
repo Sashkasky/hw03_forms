@@ -128,3 +128,47 @@ class PostsViewsTests(TestCase):
                 form_field = response.context.get('form').fields.get(value)
                 self.assertIsInstance(form_field, expected)
         self.assertIsInstance(response.context.get('form'), PostForm)
+
+
+class PaginatorViewsTest(TestCase):
+    @classmethod
+    def setUpClass(cls):
+        super().setUpClass()
+        cls.author = User.objects.create_user(username='test_user')
+        cls.group = Group.objects.create(
+            title='Тестовый заголовок',
+            slug='test-slug',
+            description='Тестовый текст',
+        )
+        objs = [
+            Post(
+                author=cls.author,
+                group=cls.group,
+                text='Тестовый заголовок',
+            )
+            for bulk in range(1, 14)
+        ]
+        cls.post = Post.objects.bulk_create(objs)
+
+    def test_first_page_contains_ten_records(self):
+        """Проверка паджинации на странице index"""
+        response = self.client.get(reverse('posts:index'))
+        self.assertEqual(len(response.context['page_obj']), 10)
+
+    def test_second_page_contains_three_records(self):
+        """Проверка паджинации на второй странице index"""
+        response = self.client.get(reverse('posts:index') + '?page=2')
+        self.assertEqual(len(response.context['page_obj']), 3)
+
+    def test_group_list_contains_ten_pages(self):
+        """Проверка паджинации на странице group_list"""
+        response = self.client.get(
+            reverse('posts:group_list', kwargs={'slug': 'test-slug'})
+        )
+        self.assertEqual(len(response.context['page_obj']), 10)
+
+    def test_profile_contains_ten_records(self):
+        """Проверка паджинации на странице profile"""
+        response = self.client.get(reverse(
+            'posts:profile', kwargs={'username': self.author.username}))
+        self.assertEqual(len(response.context['page_obj']), 10)
