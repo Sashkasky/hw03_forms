@@ -20,8 +20,14 @@ class PostsViewsTests(TestCase):
             slug='test-group-slug',
             description='Тестовое описание',
         )
+        cls.second_group = Group.objects.create(
+            title='Тестовый заголовок 2',
+            slug='test-second_group-slug',
+            description='Тестовое описание 2',
+        )
         cls.post = Post.objects.create(
             text='Тестовый текст',
+            group=cls.group,
             author=cls.user
         )
 
@@ -129,45 +135,69 @@ class PostsViewsTests(TestCase):
                 self.assertIsInstance(form_field, expected)
         self.assertIsInstance(response.context.get('form'), PostForm)
 
+    def test_new_post_in_correct_pages(self):
+        """Новый пост появляется на главной странице, на странице группы и
+        в профайле пользователя"""
+        exp_pages = [
+            reverse('posts:index'),
+            reverse(
+                'posts:group_list', kwargs={'slug': self.group.slug}),
+            reverse(
+                'posts:profile', kwargs={'username': 'SomeUser'})
+        ]
+        for revers in exp_pages:
+            with self.subTest(revers=revers):
+                response = self.authorized_client.get(revers)
+                self.assertIn(self.post, response.context['page_obj'])
+
+    def test_new_post_not_in_wrong_group(self):
+        """Пост не попал в группу, для которой не был предназначен"""
+        response = self.authorized_client.get(
+            reverse(
+                'posts:group_list', kwargs={'slug': self.second_group.slug}
+            )
+        )
+        self.assertNotIn(self.post, response.context['page_obj'])
+
 
 class PaginatorViewsTest(TestCase):
     @classmethod
     def setUpClass(cls):
         super().setUpClass()
-        cls.author = User.objects.create_user(username='test_user')
+        cls.author = User.objects.create_user(username='SomeUser')
         cls.group = Group.objects.create(
             title='Тестовый заголовок',
-            slug='test-slug',
-            description='Тестовый текст',
+            slug='test-group-slug',
+            description='Тестовое описание',
         )
         objs = [
             Post(
                 author=cls.author,
                 group=cls.group,
-                text='Тестовый заголовок',
+                text='Тестовый текст',
             )
             for bulk in range(1, 14)
         ]
         cls.post = Post.objects.bulk_create(objs)
 
-    def test_first_page_contains_ten_records(self):
+    def test_first_page_pajination(self):
         """Проверка паджинации на странице index"""
         response = self.client.get(reverse('posts:index'))
         self.assertEqual(len(response.context['page_obj']), 10)
 
-    def test_second_page_contains_three_records(self):
+    def test_second_page_pajination(self):
         """Проверка паджинации на второй странице index"""
         response = self.client.get(reverse('posts:index') + '?page=2')
         self.assertEqual(len(response.context['page_obj']), 3)
 
-    def test_group_list_contains_ten_pages(self):
+    def test_group_list_pajination(self):
         """Проверка паджинации на странице group_list"""
         response = self.client.get(
-            reverse('posts:group_list', kwargs={'slug': 'test-slug'})
+            reverse('posts:group_list', kwargs={'slug': 'test-group-slug'})
         )
         self.assertEqual(len(response.context['page_obj']), 10)
 
-    def test_profile_contains_ten_records(self):
+    def test_profile_pajination(self):
         """Проверка паджинации на странице profile"""
         response = self.client.get(reverse(
             'posts:profile', kwargs={'username': self.author.username}))
