@@ -152,12 +152,14 @@ class PostsViewsTests(TestCase):
 
     def test_new_post_not_in_wrong_group(self):
         """Пост не попал в группу, для которой не был предназначен"""
+        post = Post.objects.get(pk=1)
         response = self.authorized_client.get(
             reverse(
                 'posts:group_list', kwargs={'slug': self.second_group.slug}
             )
         )
-        self.assertNotIn(self.post, response.context['page_obj'])
+        print(response.context['page_obj'].object_list)
+        self.assertNotIn(post, response.context['page_obj'].object_list)
 
 
 class PaginatorViewsTest(TestCase):

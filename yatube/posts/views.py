@@ -23,9 +23,8 @@ def index(request):
 
 def group_posts(request, slug):
     group = get_object_or_404(Group, slug=slug)
-    posts = group.posts.all()[:settings.COUNT_POSTS]
-    post_list = Post.objects.all()
-    page_obj = get_paginator_page(request, post_list)
+    posts = group.posts.all()
+    page_obj = get_paginator_page(request, posts)
     context = {
         'group': group,
         'posts': posts,
